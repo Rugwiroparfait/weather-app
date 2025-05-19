@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const cron = require('node-cron');
+const fetchWeather = require('./utils/fetchWeather');
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -14,24 +16,34 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+  .then(() => console.log('MongoDB connected'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 // Simple test route
 app.get('/', (req, res) => {
   res.send('Weather API running');
 });
 
-// TODO: Add routes here
-
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+// Weather model and route
+const Weather = require('./models/Weather');
+app.get('/api/weather', async (req, res) => {
+  try {
+    const data = await Weather.find({});
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch weather data' });
+  }
 });
 
+// 🕒 Run fetchWeather every hour
+cron.schedule('0 * * * *', () => {
+  console.log('⏰ Running scheduled weather fetch...');
+  fetchWeather();
+});
 
-const Weather = require('./models/Weather');
-
-app.get('/api/weather', async (req, res) => {
-const data = await Weather.find({});
-res.json(data);
+// 🏁 Start Express
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+  // Optional: fetch on server start
+  fetchWeather();
 });

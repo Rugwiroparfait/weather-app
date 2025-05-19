@@ -1,14 +1,6 @@
 const axios = require('axios');
-const mongoose = require('mongoose');
-require('dotenv').config();
-
-const districts = require('../data/districtData');
 const Weather = require('../models/Weather');
-
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+const districts = require('../data/districtData');
 
 async function fetchWeatherForDistrict(district) {
   const { lat, lon, name } = district;
@@ -31,9 +23,8 @@ async function fetchWeatherForDistrict(district) {
   }
 }
 
-(async () => {
+module.exports = async function fetchWeather() {
   for (const district of districts) {
     await fetchWeatherForDistrict(district);
   }
-  mongoose.disconnect();
-})();
+};
