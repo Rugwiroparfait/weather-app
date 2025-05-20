@@ -36,6 +36,7 @@ app.get('/api/weather', async (req, res) => {
 });
 
 // 🕒 Run fetchWeather every hour
+console.log('Initializing cron job...');
 cron.schedule('0 * * * *', () => {
   console.log('⏰ Running scheduled weather fetch...');
   fetchWeather();
