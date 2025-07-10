@@ -35,6 +35,23 @@ app.get('/api/weather', async (req, res) => {
   }
 });
 
+// Add district-specific weather route
+app.get('/api/weather/:district', async (req, res) => {
+  try {
+    const data = await Weather.findOne({ district: req.params.district });
+    if (!data) {
+      return res.status(404).json({ error: 'District not found' });
+    }
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch district weather data' });
+  }
+});
+
+// Import and use the chatbot route
+const chatbotRoutes = require('./routes/chatbot');
+app.use('/api/chatbot', chatbotRoutes);
+
 // 🕒 Run fetchWeather every hour
 console.log('Initializing cron job...');
 cron.schedule('0 * * * *', () => {
