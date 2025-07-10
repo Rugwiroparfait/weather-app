@@ -3,9 +3,10 @@ const express = require('express');
 const axios = require('axios');
 const router = express.Router();
 
-// Google AI API configurations - use environment variable when available
+// Updated Google AI API configurations
 const GOOGLE_AI_API_KEY = process.env.GOOGLE_AI_API_KEY || 'AIzaSyCy3314Rjf7rqG32Tyhm27JO5-J6X0P9mQ';
-const GOOGLE_AI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+// Updated API URL - the correct Gemini Pro endpoint
+const GOOGLE_AI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro:generateContent';
 
 // Add more debugging
 router.post('/', async (req, res) => {

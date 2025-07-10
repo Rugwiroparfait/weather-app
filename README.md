@@ -84,8 +84,8 @@ frontend/
 ### 1. Repository Initialization
 
 ```bash
-git clone https://github.com/Rugwiroparfait/rwanda-weather-api.git
-cd rwanda-weather-api
+git clone https://github.com/Rugwiroparfait/weather-app.git
+cd weather-app
 ```
 
 ### 2. Backend Configuration
