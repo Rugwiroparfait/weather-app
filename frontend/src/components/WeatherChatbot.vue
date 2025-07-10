@@ -104,7 +104,9 @@ export default {
         // Get weather context
         const weatherContext = this.getWeatherContext();
         
-        // Call the chatbot API
+        console.log('Sending message to chatbot API...');
+        
+        // Call the chatbot API with enhanced error handling
         const response = await this.callChatbotAPI(userMessage, weatherContext);
         
         // Replace loading indicator with response
@@ -112,11 +114,27 @@ export default {
         this.messages.push({ sender: 'bot', content: response });
       } catch (error) {
         console.error('Error with chatbot:', error);
-        // Replace loading indicator with error message
+        // Replace loading indicator with more specific error message
         this.messages.pop(); // Remove loading indicator
+        
+        let errorMsg = 'Sorry, I had trouble processing your request. Please try again later.';
+        
+        // Customize error message based on type of error
+        if (error.response) {
+          // The server responded with an error status
+          if (error.response.status === 404) {
+            errorMsg = 'The chatbot service cannot be reached. Please check if the backend is running.';
+          } else if (error.response.status >= 500) {
+            errorMsg = 'The chatbot service is experiencing issues. Please try again later.';
+          }
+        } else if (error.request) {
+          // The request was made but no response was received
+          errorMsg = 'No response from the chatbot service. Please check your internet connection.';
+        }
+        
         this.messages.push({ 
           sender: 'bot', 
-          content: 'Sorry, I had trouble processing your request. Please try again later.' 
+          content: errorMsg
         });
       } finally {
         this.isProcessing = false;
@@ -134,13 +152,21 @@ export default {
     },
     async callChatbotAPI(userMessage, weatherContext) {
       try {
-        const response = await axios.post('/api/chatbot', {
+        // Add timeout and better error handling
+        const response = await axios.post('http://localhost:3000/api/chatbot', {
           message: userMessage,
           context: weatherContext
+        }, {
+          timeout: 15000 // 15 second timeout
         });
+        
+        if (!response.data || !response.data.response) {
+          throw new Error('Invalid response format');
+        }
+        
         return response.data.response;
       } catch (error) {
-        console.error('API error:', error);
+        console.error('API error details:', error);
         throw error;
       }
     },

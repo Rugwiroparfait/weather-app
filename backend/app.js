@@ -8,7 +8,13 @@ const fetchWeather = require('./utils/fetchWeather');
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(cors());
+// Enhanced CORS configuration
+app.use(cors({
+  origin: ['http://localhost:8080', 'http://localhost:8081'],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 // Connect to MongoDB
